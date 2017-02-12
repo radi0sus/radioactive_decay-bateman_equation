@@ -1,0 +1,83 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 16.04.2 ] */
+
+/* [wxMaxima: input   start ] */
+/* 
+Calculation of radioactive decay chains (mother -> daugther -> granddaughter .....): 1 -> 2 -> 3 -> 4 -> .....
+using the Bateman equation. 
+(wx)Maxima script
+Start with Shift + Enter. 
+*/
+kill(all);
+/* 
+Values to change. 
+- l means lamda which is the decay constant 
+- lambda = log(2)/t(1/2) (log means the natural logarithm)
+- t(1/2) is half-life (units (e.g. seconds, days, years) should be equal for all t(1/2))
+- N0 is the initial amount of active substance. Since the script calculates relative values, 
+  changes of N0 have no effect on the result.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Po-218 (t(1/2)=3.05 min)-> At-218 (t(1/2)=2 s) -> Pb-214 (t(1/2)=26.8 min) -> Bi-214 (t(1/2)=19.9 min) -> 
+Po-214 (t(1/2)=164 µs) -> Tl-210 (t(1/2)=1.30 min) -> Pb-210 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+N0: 1;
+l1 : log(2)/(3.05); /* insert t(1/2) or lambda here */
+l2 : log(2)/(2/60);  /* t(1/2) can be seconds, days, years...should be equal for all t(1/2)) */
+l3 : log(2)/(26.8); 
+l4 : log(2)/(19.9); 
+l5 : log(2)/(164/1000/1000/60); 
+l6 : log(2)/(1.3); 
+/* 
+You can add equations or delete equations to simulate different decay chains.
+After eq_1 the general formula is:
+dN_n/dt = -l_n*N_n + l_n-1*N_n-1
+Don't forget to add or delete terms in the following lines.
+*/
+eq_1: 'diff(N1(t),t) = -l1*N1(t);
+eq_2: 'diff(N2(t),t) = -l2*N2(t)+l1*N1(t);
+eq_3: 'diff(N3(t),t) = -l3*N3(t)+l2*N2(t);
+eq_4: 'diff(N4(t),t) = -l4*N4(t)+l3*N3(t);
+eq_5: 'diff(N5(t),t) = -l5*N5(t)+l4*N4(t);
+eq_6: 'diff(N6(t),t) = -l6*N6(t)+l5*N5(t);
+/* 
+Some useful conditions:
+*/
+atvalue(N1(t),t=0,N0);
+atvalue(N2(t),t=0,0);
+atvalue(N3(t),t=0,0);
+atvalue(N4(t),t=0,0);
+atvalue(N5(t),t=0,0);
+atvalue(N6(t),t=0,0);
+/* 
+Solution:
+*/
+sol: desolve([eq_1, eq_2, eq_3, eq_4, eq_5, eq_6],[N1(t),N2(t),N3(t),N4(t),N5(t),N6(t)]);
+/* 
+Sum of all activities. For the activities (A) every N is multiplied with lambda (decay constant, l):
+A = l * N
+*/
+sum_act: sol[1]*l1/(N0*l1)+sol[2]*l2/(N0*l1)+sol[3]*l3/(N0*l1)+sol[4]*l4/(N0*l1)+sol[5]*l4/(N0*l1)+sol[6]*l4/(N0*l1);
+/* 
+Plot mother (1) -> daugther (2) -> granddaughter (3)...n and the sum:
+x and y log scale
+After closing the first plot window, the second plot will apear.
+*/
+plot2d ([rhs(sol[1]*l1/(N0*l1)),rhs(sol[2]*l2/(N0*l1)),rhs(sol[3]*l3/(N0*l1)),
+        rhs(sol[4]*l4/(N0*l1)),rhs(sol[5]*l4/(N0*l1)),rhs(sol[6]*l4/(N0*l1)),rhs(sum_act)],
+        [t,0.001,2000],[xlabel, "t/min"],[ylabel, "rel. Activity (A/A0)"],
+        [legend,"Po-218","At-218","Pb-214","Bi-214","Po-214","Tl-210","sum"],
+        [gnuplot_preamble,"set yrange [1E-17:100];set key outside"]
+        ,logy,logx)$
+/* 
+x log scale
+*/
+plot2d ([rhs(sol[1]*l1/(N0*l1)),rhs(sol[2]*l2/(N0*l1)),rhs(sol[3]*l3/(N0*l1)),
+        rhs(sol[4]*l4/(N0*l1)),rhs(sol[5]*l4/(N0*l1)),rhs(sol[6]*l4/(N0*l1)),rhs(sum_act)],
+        [t,0.001,15],[xlabel, "t/min"],[ylabel, "rel. Activity (A/A0)"],
+        [legend,"Po-218","At-218","Pb-214","Bi-214","Po-214","Tl-210","sum"],
+        [gnuplot_preamble,"set yrange [1E-17:2];set key outside"],logx)$
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

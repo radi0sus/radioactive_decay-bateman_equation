@@ -1,0 +1,75 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 16.04.2 ] */
+
+/* [wxMaxima: input   start ] */
+/* 
+Calculation of radioactive decay chains (mother -> daugther -> granddaughter .....): 1 -> 2 -> 3 -> 4 -> .....
+using the Bateman equation.
+(wx)Maxima script
+Start with Shift + Enter. 
+*/
+kill(all);
+/* 
+Values to change. 
+- l means lamda which is the decay constant 
+- lambda = log(2)/t(1/2) (log means the natural logarithm)
+- t(1/2) is half-life (units (e.g. seconds, days, years) should be equal for all t(1/2))
+- N0 is the initial amount of active substance. Since the script calculates relative values, 
+  changes of N0 have no effect on the result.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+1 (t(1/2=12.77)) -> 2 (t(1/2=1.68)) -> 3 (t(1/2=10)) -> 4 (t(1/2=12))
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
+N0: 1;
+l1 : log(2)/12.77; /* insert t(1/2) or lambda here */
+l2 : log(2)/1.68;  /* t(1/2) can be seconds, days, years...should be equal for all t(1/2)) */
+l3 : log(2)/10; 
+l4 : log(2)/12; 
+/* 
+You can add equations or delete equations to simulate different decay chains.
+After eq_1 the general formula is:
+dN_n/dt = -l_n*N_n + l_n-1*N_n-1
+Don't forget to add or delete terms in the following lines.
+*/
+eq_1: 'diff(N1(t),t) = -l1*N1(t);
+eq_2: 'diff(N2(t),t) = -l2*N2(t)+l1*N1(t);
+eq_3: 'diff(N3(t),t) = -l3*N3(t)+l2*N2(t);
+eq_4: 'diff(N4(t),t) = -l4*N4(t)+l3*N3(t);
+/* 
+Some useful conditions:
+*/
+atvalue(N1(t),t=0,N0);
+atvalue(N2(t),t=0,0);
+atvalue(N3(t),t=0,0);
+atvalue(N4(t),t=0,0);
+/* 
+Solution:
+*/
+sol: desolve([eq_1, eq_2, eq_3, eq_4],[N1(t),N2(t),N3(t),N4(t)]);
+/* 
+Sum of all activities. For the activities (A) every N is multiplied with lambda (decay constant, l):
+A = l * N
+*/
+sum_act: sol[1]*l1/(N0*l1)+sol[2]*l2/(N0*l1)+sol[3]*l3/(N0*l1)+sol[4]*l4/(N0*l1);
+/* 
+Plot mother (1) -> daugther (2) -> granddaughter (3)...n and the sum:
+y log scale
+After closing the first plot window, the second plot will apear.
+*/
+plot2d ([rhs(sol[1]*l1/(N0*l1)),rhs(sol[2]*l2/(N0*l1)),rhs(sol[3]*l3/(N0*l1)),
+        rhs(sol[4]*l4/(N0*l1)),rhs(sum_act)],[t,0.001,220],
+        [xlabel, "t"],[ylabel, "rel. Activity (A/A0)"],
+        [legend,"1","2","3","4","sum"],
+        [gnuplot_preamble,"set yrange [0.001:3];set key outside"],logy)$
+/* 
+normal scale
+*/
+plot2d ([rhs(sol[1]*l1/(N0*l1)),rhs(sol[2]*l2/(N0*l1)),rhs(sol[3]*l3/(N0*l1)),
+        rhs(sol[4]*l4/(N0*l1)),rhs(sum_act)],[t,0.001,150],
+        [xlabel, "t"],[ylabel, "rel. Activity (A/A0)"],
+        [legend,"1","2","3","4","sum"],
+        [gnuplot_preamble,"set yrange [0.001:1.8];set key outside"])$
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$
