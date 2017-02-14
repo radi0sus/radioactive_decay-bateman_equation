@@ -61,7 +61,8 @@ sum_act: sol[1]*l1/(N0*l1)+sol[2]*l2/(N0*l1)+sol[3]*l3/(N0*l1)+sol[4]*l4/(N0*l1)
 /* 
 Plot mother (1) -> daugther (2) -> granddaughter (3)...n and the sum:
 x and y log scale
-After closing the first plot window, the second plot will apear.
+Windows: After closing the first plot window, the second plot will apear. Doesn't work under Linux.
+You can replace plot2d with wxplot2d in wxMaxima to see both plots at a time.
 */
 plot2d ([rhs(sol[1]*l1/(N0*l1)),rhs(sol[2]*l2/(N0*l1)),rhs(sol[3]*l3/(N0*l1)),
         rhs(sol[4]*l4/(N0*l1)),rhs(sol[5]*l4/(N0*l1)),rhs(sol[6]*l4/(N0*l1)),rhs(sum_act)],
