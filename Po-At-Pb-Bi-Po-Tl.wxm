@@ -57,7 +57,7 @@ sol: desolve([eq_1, eq_2, eq_3, eq_4, eq_5, eq_6],[N1(t),N2(t),N3(t),N4(t),N5(t)
 Sum of all activities. For the activities (A) every N is multiplied with lambda (decay constant, l):
 A = l * N
 */
-sum_act: sol[1]*l1/(N0*l1)+sol[2]*l2/(N0*l1)+sol[3]*l3/(N0*l1)+sol[4]*l4/(N0*l1)+sol[5]*l5/(N0*l1)+sol[6]*l5/(N0*l1);
+sum_act: sol[1]*l1/(N0*l1)+sol[2]*l2/(N0*l1)+sol[3]*l3/(N0*l1)+sol[4]*l4/(N0*l1)+sol[5]*l5/(N0*l1)+sol[6]*l6/(N0*l1);
 /* 
 Plot mother (1) -> daugther (2) -> granddaughter (3)...n and the sum:
 x and y log scale
