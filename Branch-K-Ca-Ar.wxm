@@ -1,0 +1,95 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 16.04.2 ] */
+
+/* [wxMaxima: input   start ] */
+/* 
+Calculation of branched decays (mother -> daughter1 + daughter2): 1 -> 2 + 3 
+using the Bateman equation.
+(wx)Maxima script
+Start with Shift + Enter. 
+*/
+kill(all);
+/* 
+Values to change. 
+- l means lamda which is the decay constant 
+- lambda = log(2)/t(1/2) (log means the natural logarithm)
+- if the daughters are stable lambda is zero: l(daughter) = 0
+- t(1/2) is half-life (units (e.g. seconds, days, years) should be equal for all t(1/2))
+- r is the branching ratio  
+- N0 is the initial amount of active substance. 
+
+Some notes about the calculation:
+---------------------------------
+A nucleus (1) decays into two different nuclei (2 and 3) with the decay constants l1_1 for one 
+particular decay and l1_2 for the second.
+The decay constant of the mother is then: l1 = l1_1 + l1_2 [1].
+(Note that l1_1/l1_2 are not the decay constants of 2 and 3.)
+The branching ratio of the first decay is:  r1_1 = l1_1 / (l1_1 + l1_2) = l1_1/l1 with eq. [1].
+The branching ratio of the second decay is: r1_2 = l1_2 / (l1_1 + l1_2) = l1_2/l1 with eq. [1].
+The formation and decay of 2 is then:
+dN2/dt = -l2*N2 + l1_1*N1 with l1_1 = r1_1*l1 --> dN2/dt = -l2*N2 + r1_1*l1*N1
+
+(Note: If 2 is a stable isotope (no further decay of 2), l2 is zero, then the formation of 2 is:
+dN2/dt = r1_1*l1*N1.)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                                   /-(beta)-(r1_1(%): 89.28%)-> Ca-40 (stable)
+K-40 (t(1/2)=1.248*10^9 years)) ---   
+                                   \-(ec)-(r1_2(%): 10.72%)---> Ar*-40 -(gamma)-> Ar-40(stable)                            
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+(Note that K-40 -(ec)-> Ar-40 (0.001%) branch is ignored.)
+The formula in text books for the amount of Ar is sometimes given as: Ar-40 = 0.1072 * K-40 *(e^(l*t)-1).
+If you plot the above functions as f(t) := r1_2*(N0*exp(-l1*t))*(exp(l1*t)-1) along with the 
+solution from the this script you'll see that the Ar-curve and f(t) match. 
+*/
+N0: 1;                    /* Initial amount; change it to 1000 if you feel uncomfortable */
+r1_1 : 0.8928;            /* branching ratio */
+r1_2 : 0.1072;
+l1 : log(2)/(1.248*10^9); /* insert t(1/2) or lambda here */
+l2 : 0;                   /* l = 0 for stable isotopes */
+l3 : 0;
+/* 
+You can add equations or delete equations to simulate different decay chains and branches.
+After eq_1 the general formula is:
+dNn/dt = -ln*Nn + rl(n-1)*l(n-1)*N(n-1)
+if no branching occurs then r = 1
+Don't forget to add or delete terms in the following lines.
+*/
+eq_1: 'diff(N1(t),t) = -l1*N1(t);
+eq_2: 'diff(N2(t),t) = -l2*N2(t)+r1_1*l1*N1(t);
+eq_3: 'diff(N3(t),t) = -l3*N3(t)+r1_2*l1*N1(t);
+/* 
+Some useful conditions:
+*/
+atvalue(N1(t),t=0,N0);
+atvalue(N2(t),t=0,0);
+atvalue(N3(t),t=0,0);
+/* 
+Solution:
+*/
+sol: desolve([eq_1, eq_2, eq_3],[N1(t),N2(t),N3(t)]);
+/* 
+Sum of all N (should give N0 in this example)
+*/
+sum_N: sol[1]+sol[2]+sol[3];
+/* 
+Plot N mother (1) (decay) -> daughter (2) (formation) + daughter (3) ()formation) and the sum:
+y log scale
+Windows: After closing the first plot window, the second plot will appear. Doesn't work under Linux.
+You can replace plot2d with wxplot2d in wxMaxima to see both plots at a time.
+*/
+plot2d ([rhs(sol[1]),rhs(sol[2]),rhs(sol[3]),rhs(sum_N)],[t,0.001,8*10^9],
+        [xlabel, "t"],[ylabel, "Number of particles (N)"],
+        [legend,"K-40","Ca-40","Ar-40","N_max","f(t)"],
+        [gnuplot_preamble,"set yrange [0.001:2];set key outside"],logy)$
+/* 
+normal scale
+*/
+plot2d ([rhs(sol[1]),rhs(sol[2]),rhs(sol[3]),rhs(sum_N)],[t,0.001,8*10^9],
+        [xlabel, "t"],[ylabel, "Number of particles (N)"],
+        [legend,"K-40","Ca-40","Ar-40","N_max","f(t)"],
+        [gnuplot_preamble,"set yrange [0.001:1.1];set key outside"])$
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$
