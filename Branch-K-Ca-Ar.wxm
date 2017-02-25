@@ -80,14 +80,14 @@ You can replace plot2d with wxplot2d in wxMaxima to see both plots at a time.
 */
 plot2d ([rhs(sol[1]),rhs(sol[2]),rhs(sol[3]),rhs(sum_N)],[t,0.001,8*10^9],
         [xlabel, "t"],[ylabel, "Number of particles (N)"],
-        [legend,"K-40","Ca-40","Ar-40","N_max","f(t)"],
+        [legend,"K-40","Ca-40","Ar-40","N_max"],
         [gnuplot_preamble,"set yrange [0.001:2];set key outside"],logy)$
 /* 
 normal scale
 */
 plot2d ([rhs(sol[1]),rhs(sol[2]),rhs(sol[3]),rhs(sum_N)],[t,0.001,8*10^9],
         [xlabel, "t"],[ylabel, "Number of particles (N)"],
-        [legend,"K-40","Ca-40","Ar-40","N_max","f(t)"],
+        [legend,"K-40","Ca-40","Ar-40","N_max"],
         [gnuplot_preamble,"set yrange [0.001:1.1];set key outside"])$
 /* [wxMaxima: input   end   ] */
 
