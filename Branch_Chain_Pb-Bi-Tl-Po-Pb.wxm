@@ -31,7 +31,7 @@ Tl-208 and Po-212 decay to the stable Pb-212.
 Decay of Pb-208                 : dN1/dt=-l1*N1
 Formation and decay of Bi-212   : dN2/dt=-l2*N2+l1*N1
 Formation and decay of Tl-208   : dN3/dt=-l3*N3+r2_1*l2*N2; r2_1=l2_1/l2=0.36
-Formation and decay of Po-212   : dN4/dt=-l4*N4+r2_2*l2*N2; r2_2=l2_3/l2=0.64
+Formation and decay of Po-212   : dN4/dt=-l4*N4+r2_2*l2*N2; r2_2=l2_2/l2=0.64
 Formation of Pb-208             : dN5/dt=-l5*N5+l3*N3+l4*N4; stable isotope -> l5=0 (-l5*N5=0)
 Formation of Pb-208             : dN5/dt= l3*N3+l4*N4
 
