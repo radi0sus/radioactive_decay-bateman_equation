@@ -1,0 +1,112 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 16.04.2 ] */
+
+/* [wxMaxima: input   start ] */
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 16.04.2 ] */
+
+/* [wxMaxima: input   start ] */
+/* 
+Calculation of decay chains with branched decays (mother -> daughter1 + daughter2): 1 -> 2 -> 3 + 4 -> 5 
+using the Bateman equation.
+(wx)Maxima script
+Start with Shift + Enter. 
+*/
+kill(all);
+/* 
+Values to change. 
+- l means lamda which is the decay constant 
+- lambda = log(2)/t(1/2) (log means the natural logarithm)
+- if the daughters are stable lambda is zero: l(daughter) = 0
+- t(1/2) is half-life (units (e.g. seconds, days, years) should be equal for all t(1/2))
+- r is the branching ratio  
+- N0 is the initial amount of active substance. 
+
+Some notes about the calculation:
+---------------------------------
+Pb-208 decays to Bi-212.
+Bi-212 decays to Tl-208 and Po-212.
+Tl-208 and Po-212 decay to the stable Pb-212.
+
+Decay of Pb-208                 : dN1/dt=-l1*N1
+Formation and decay of Bi-212   : dN2/dt=-l2*N2+l1*N1
+Formation and decay of Tl-208   : dN3/dt=-l3*N3+r2_1*l2*N2; r2_1=l2_1/l2=0.36
+Formation and decay of Po-212   : dN4/dt=-l4*N4+r2_2*l2*N2; r2_2=l2_3/l2=0.64
+Formation of Pb-208             : dN5/dt=-l5*N5+l3*N3+l4*N4; stable isotope -> l5=0 (-l5*N5=0)
+Formation of Pb-208             : dN5/dt= l3*N3+l4*N4
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                                Pb-212 (t(1/2)=10.64 h)
+                                        |(beta)
+                                        |
+                                Bi-212 (t(1/2)=60.60 min)
+                           36% / (alpha)            64% \ (beta)
+                              /                          \
+          Tl-208 (t(1/2)=3 min)                          Po-212 (t(1/2)=304 ns) 
+                            | (gamma)                     |
+                            | (gamma)                     |
+                            | (gamma)                     |
+                            \ (beta)                      / (alpha)
+                             \                           /
+                                    Pb-208 (stable)                           
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+*/
+N0: 1;                  /* Initial amount; change it to 1000 if you feel uncomfortable */
+r2_1 : 0.36;            /* branching ratio */
+r2_2 : 0.64;
+l1 : log(2)/(638.4);    /* insert t(1/2) or lambda here */
+l2 : log(2)/(60.6);     /* l = 0 for stable isotopes */
+l3 : log(2)/(3);
+l4 : log(2)/(5.0667e-9);
+l5 : 0;
+/* 
+You can add equations or delete equations to simulate different decay chains and branches.
+Don't forget to add or delete terms in the following lines.
+*/
+eq_1: 'diff(N1(t),t) = -l1*N1(t);                       /* Pb-212 decay */
+eq_2: 'diff(N2(t),t) = -l2*N2(t)+l1*N1(t);              /* Bi-212 decay + formation */
+eq_3: 'diff(N3(t),t) = -l3*N3(t)+r2_1*l2*N2(t);         /* Tl-208 decay + formation */
+eq_4: 'diff(N4(t),t) = -l4*N4(t)+r2_2*l2*N2(t);         /* Po-212 decay + formation */
+eq_5: 'diff(N5(t),t) = -l5*N5(t)+l3*N3(t)+l4*N4(t);     /* Pb-208(stable) formation */
+/* 
+Some useful conditions:
+*/
+atvalue(N1(t),t=0,N0);
+atvalue(N2(t),t=0,0);
+atvalue(N3(t),t=0,0);
+atvalue(N4(t),t=0,0);
+atvalue(N5(t),t=0,0);
+/* 
+Solution:
+*/
+sol: desolve([eq_1, eq_2, eq_3, eq_4, eq_5],[N1(t),N2(t),N3(t),N4(t),N5(t)]);
+/* 
+Sum of all N (should give N0 in this example)
+*/
+sum_N: sol[1]+sol[2]+sol[3]+sol[4]+sol[5];
+/* 
+Plot 
+x y log scale
+Windows: After closing the first plot window, the second plot will appear. Doesn't work under Linux.
+You can replace plot2d with wxplot2d in wxMaxima to see both plots at a time.
+*/
+plot2d ([rhs(sol[1]),rhs(sol[2]),rhs(sol[3]),rhs(sol[4]),rhs(sol[5]),rhs(sum_N)],[t,1e-4,100000],
+        [xlabel, "t/min"],[ylabel, "Number of particles (N)"],
+        [legend,"Pb-212","Bi-212","Tl-208","Po-212","Pb-208","N_max"],
+        [gnuplot_preamble,"set yrange [1e-24:20];set key outside"],logx,logy)$
+/* 
+normal scale
+*/
+plot2d ([rhs(sol[1]),rhs(sol[2]),rhs(sol[3]),rhs(sol[4]),rhs(sol[5]),rhs(sum_N)],[t,0.001,6000],
+        [xlabel, "t/min"],[ylabel, "Number of particles (N)"],
+        [legend,"Pb-212","Bi-212","Tl-208","Po-212","Pb-208","N_max"],
+        [gnuplot_preamble,"set yrange [1e-14:1.1];set key outside"])$
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$
